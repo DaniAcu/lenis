@@ -1,0 +1,8 @@
+{ 
+  "compilerOptions": {
+    "allowJs": false,
+    "resolveJsonModule": true,
+    "lib": ["es5", "es6", "dom"], 
+    "target": "es5"
+  }
+}

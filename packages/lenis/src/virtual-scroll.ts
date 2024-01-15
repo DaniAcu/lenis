@@ -1,9 +1,19 @@
-import { Emitter } from './emitter'
-import { clamp } from './maths'
+import { Emitter } from './emitter';
+import { clamp } from './maths';
+
+type Callback = (...args: any[]) => void;
 
 export class VirtualScroll {
+  wheelMultiplier: number
+  touchMultiplier: number
+  normalizeWheel: boolean
+  touchStart: { x: number; y: number }
+  lastDelta: { x: number; y: number; };
+
+  private emitter = new Emitter();
+  
   constructor(
-    element,
+    private element: HTMLElement,
     { wheelMultiplier = 1, touchMultiplier = 2, normalizeWheel = false }
   ) {
     this.element = element
@@ -12,11 +22,9 @@ export class VirtualScroll {
     this.normalizeWheel = normalizeWheel
 
     this.touchStart = {
-      x: null,
-      y: null,
+      x: 0,
+      y: 0,
     }
-
-    this.emitter = new Emitter()
 
     this.element.addEventListener('wheel', this.onWheel, { passive: false })
     this.element.addEventListener('touchstart', this.onTouchStart, {
@@ -31,7 +39,7 @@ export class VirtualScroll {
   }
 
   // Add an event listener for the given event and callback
-  on(event, callback) {
+  on(event: "scroll", callback: Callback) {
     return this.emitter.on(event, callback)
   }
 
@@ -39,22 +47,14 @@ export class VirtualScroll {
   destroy() {
     this.emitter.destroy()
 
-    this.element.removeEventListener('wheel', this.onWheel, {
-      passive: false,
-    })
-    this.element.removeEventListener('touchstart', this.onTouchStart, {
-      passive: false,
-    })
-    this.element.removeEventListener('touchmove', this.onTouchMove, {
-      passive: false,
-    })
-    this.element.removeEventListener('touchend', this.onTouchEnd, {
-      passive: false,
-    })
+    this.element.removeEventListener('wheel', this.onWheel)
+    this.element.removeEventListener('touchstart', this.onTouchStart)
+    this.element.removeEventListener('touchmove', this.onTouchMove)
+    this.element.removeEventListener('touchend', this.onTouchEnd)
   }
 
   // Event handler for 'touchstart' event
-  onTouchStart = (event) => {
+  private onTouchStart = (event) => {
     const { clientX, clientY } = event.targetTouches
       ? event.targetTouches[0]
       : event
@@ -75,7 +75,7 @@ export class VirtualScroll {
   }
 
   // Event handler for 'touchmove' event
-  onTouchMove = (event) => {
+  private onTouchMove = (event) => {
     const { clientX, clientY } = event.targetTouches
       ? event.targetTouches[0]
       : event
@@ -98,7 +98,7 @@ export class VirtualScroll {
     })
   }
 
-  onTouchEnd = (event) => {
+  private onTouchEnd = (event) => {
     this.emitter.emit('scroll', {
       deltaX: this.lastDelta.x,
       deltaY: this.lastDelta.y,
@@ -107,7 +107,7 @@ export class VirtualScroll {
   }
 
   // Event handler for 'wheel' event
-  onWheel = (event) => {
+  private onWheel = (event) => {
     let { deltaX, deltaY } = event
 
     if (this.normalizeWheel) {

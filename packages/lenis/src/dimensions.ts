@@ -1,14 +1,23 @@
-import { debounce } from './debounce'
+import { debounce } from './debounce';
 
 export class Dimensions {
-  constructor({ wrapper, content, autoResize = true } = {}) {
-    this.wrapper = wrapper
-    this.content = content
-
+  private readonly wrapperResizeObserver: ResizeObserver;
+  private readonly contentResizeObserver: ResizeObserver;
+  
+  width: number;
+  height: number;
+  scrollHeight: number;
+  scrollWidth: number;
+  
+  constructor(
+    private readonly wrapper: HTMLElement | Window,
+    private readonly content: HTMLElement,
+    autoResize = true
+  ) {
     if (autoResize) {
       const resize = debounce(this.resize, 250)
 
-      if (this.wrapper !== window) {
+      if (!isWindow(this.wrapper)) {
         this.wrapperResizeObserver = new ResizeObserver(resize)
         this.wrapperResizeObserver.observe(this.wrapper)
       }
@@ -17,7 +26,7 @@ export class Dimensions {
       this.contentResizeObserver.observe(this.content)
     }
 
-    this.resize()
+    this.resize();
   }
 
   destroy() {
@@ -31,7 +40,7 @@ export class Dimensions {
   }
 
   onWrapperResize = () => {
-    if (this.wrapper === window) {
+    if (isWindow(this.wrapper)) {
       this.width = window.innerWidth
       this.height = window.innerHeight
     } else {
@@ -52,3 +61,7 @@ export class Dimensions {
     }
   }
 }
+
+function isWindow(value: any): value is Window {
+  return value === window
+} 

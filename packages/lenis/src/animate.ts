@@ -2,8 +2,19 @@ import { clamp, damp } from './maths'
 
 // Animate class to handle value animations with lerping or easing
 export class Animate {
+  private isRunning: boolean
+  private lerp: number
+  private value: number
+  private from: number
+  private to: number
+  private duration: number
+  private easing: (t: number) => number
+  private currentTime: number
+  private onUpdate: (value: number, completed: boolean) => void
+  
+  
   // Advance the animation by the given delta time
-  advance(deltaTime) {
+  advance(deltaTime: number) {
     if (!this.isRunning) return
 
     let completed = false
@@ -39,8 +50,8 @@ export class Animate {
   // Set up the animation from a starting value to an ending value
   // with optional parameters for lerping, duration, easing, and onUpdate callback
   fromTo(
-    from,
-    to,
+    from: number,
+    to: number,
     { lerp = 0.1, duration = 1, easing = (t) => t, onStart, onUpdate }
   ) {
     this.from = this.value = from

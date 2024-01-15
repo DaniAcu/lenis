@@ -102,7 +102,7 @@ export default class Lenis {
 
     this.animate = new Animate()
     this.emitter = new Emitter()
-    this.dimensions = new Dimensions({ wrapper, content, autoResize })
+    this.dimensions = new Dimensions(wrapper, content, autoResize)
     this.toggleClass('lenis', true)
 
     this.velocity = 0

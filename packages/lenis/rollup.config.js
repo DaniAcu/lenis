@@ -1,5 +1,6 @@
 import json from '@rollup/plugin-json'
 import terser from '@rollup/plugin-terser'
+import typescript from '@rollup/plugin-typescript'
 
 export default [
   {
@@ -41,6 +42,7 @@ export default [
       },
     ],
     plugins: [
+      typescript(),
       terser({
         keep_classnames: true,
       }),
